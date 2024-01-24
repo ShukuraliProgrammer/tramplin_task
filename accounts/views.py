@@ -25,12 +25,13 @@ class VerifySmsCodeView(CreateAPIView):
 
             code = serializer.validated_data.get("code")
             data = cache.get(code)
-
+            print("data", data)
             if data is None:
                 return Response({"message": "code_was_invalid_or_expired"},
                                 status=status.HTTP_400_BAD_REQUEST)
 
             user_data = bot.get_chat(data)
+            print("user_data", user_data)
             profile = get_profile(user_data.username)
 
             if profile is False:
