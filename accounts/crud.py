@@ -13,5 +13,6 @@ def get_profile(username):
 
 def create_profile(username, phone, user_id):
     """This function creates profile object and returns it"""
-
+    if get_profile(username):
+        return get_profile(username)
     return Profile.objects.create(username=username, phone=phone, user_id=user_id)

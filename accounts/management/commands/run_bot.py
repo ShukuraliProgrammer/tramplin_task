@@ -32,7 +32,8 @@ def contact(message: Message):
     if message.contact.user_id == message.from_user.id:
         create_profile(message.from_user.username, message.contact.phone_number, user_id)
         code = generate_code()
-        bot.set_state(user_id, str(code))  # This line saves code to bot state for user
+        now = datetime.now().second + 60
+        bot.set_state(user_id, str(str(code) + "_" + str(now)))  # This line saves code to bot state for user
         cache.set(code, user_id, timeout=60)
         bot.send_message(message.chat.id, f"🔒 Kodingiz:\n`{code}`", parse_mode="Markdown",
                          reply_markup=ReplyKeyboardRemove())
@@ -47,8 +48,10 @@ def login(message: Message):
 
     user_id = message.from_user.id
     now = datetime.now()
-    code = bot.get_state(user_id)
-    if code and cache.ttl(code) > now.second:
+
+    code, time = bot.get_state(user_id).split("_")
+
+    if code and int(time) > now.second:
         bot.send_message(message.chat.id, f"Eski kodingiz hali ham kuchda ☝️",
                          reply_markup=ReplyKeyboardRemove())
     else:
