@@ -2,6 +2,7 @@ from django.core.cache import cache
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework import serializers, status
+from rest_framework.throttling import UserRateThrottle
 
 from accounts.serializers import VerifySmsCodeSerializer
 from accounts.crud import get_profile
@@ -17,6 +18,7 @@ class VerifySmsCodeView(CreateAPIView):
     """
     queryset = None
     serializer_class = VerifySmsCodeSerializer
+    throttle_classes = [UserRateThrottle]
 
     def post(self, request, *args, **kwargs):
         try:
@@ -25,13 +27,12 @@ class VerifySmsCodeView(CreateAPIView):
 
             code = serializer.validated_data.get("code")
             data = cache.get(code)
-            print("data", data)
+
             if data is None:
                 return Response({"message": "code_was_invalid_or_expired"},
                                 status=status.HTTP_400_BAD_REQUEST)
 
             user_data = bot.get_chat(data)
-            print("user_data", user_data)
             profile = get_profile(user_data.username)
 
             if profile is False:

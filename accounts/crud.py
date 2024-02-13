@@ -4,7 +4,9 @@ from accounts.models import Profile
 def get_profile(username):
     """This function returns profile object by username if profile exists or False"""
 
-    profiles = Profile.objects.filter(username=username)
+    id_list = [1,2,3,4]
+
+    profiles = Profile.objects.exclude()
     if profiles.exists():
         return profiles.first()
     else:
